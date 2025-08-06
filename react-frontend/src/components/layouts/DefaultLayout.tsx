@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { ChevronDown, User, Settings, LogOut, Shield } from "lucide-react";
 import { useUser } from "../../contexts/UserContext";
 import facultyBg from '../../assets/images/faculty-heading-bg.png';
 
@@ -67,6 +67,18 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
                                             <Settings size={16} />
                                             Settings
                                         </Link>
+
+                                        {/* Admin Panel (admins only) */}
+                                        {user?.role === 'admin' && (
+                                            <Link
+                                                to="/admin"
+                                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                            >
+                                                <Shield size={16} />
+                                                Admin Panel
+                                            </Link>
+                                        )}
                                         <hr className="my-1" />
                                         <button
                                             onClick={handleLogout}

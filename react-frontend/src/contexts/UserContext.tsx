@@ -9,6 +9,7 @@ export interface User {
   email: string;
   created_at: string;
   updated_at?: string;
+  role?: 'admin' | 'user' | string; // added role for RBAC
 }
 
 // Auth state interface
@@ -121,7 +122,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       const response = await api.get('/api/me');
       
       if (response.data.status === 'success') {
-        dispatch({ type: 'AUTH_SUCCESS', payload: response.data.data });
+        const user = response.data.data;
+        // Ensure role exists on client side (fallback to 'user')
+        const normalized = { ...user, role: user.role ?? 'user' };
+        dispatch({ type: 'AUTH_SUCCESS', payload: normalized });
       } else {
         dispatch({ type: 'AUTH_FAILURE', payload: 'Authentication failed' });
       }
@@ -165,8 +169,18 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       });
 
       if (response.data.status === 'success') {
-        // After successful registration, fetch user data
-        await checkAuth();
+        // After successful registration, automatically log in
+        const loginResponse = await api.post('/api/login', {
+          email,
+          password,
+        });
+
+        if (loginResponse.status === 200) {
+          // After successful login, fetch user data
+          await checkAuth();
+        } else {
+          dispatch({ type: 'AUTH_FAILURE', payload: 'Auto-login failed after registration' });
+        }
       } else {
         dispatch({ type: 'AUTH_FAILURE', payload: 'Registration failed' });
       }

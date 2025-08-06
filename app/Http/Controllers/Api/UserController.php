@@ -224,7 +224,8 @@ class UserController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'created_at' => $user->created_at
+                    'role' => $user->role ?? 'user',
+                    'created_at' => $user->created_at,
                 ],
                 'message' => 'Current user retrieved successfully'
             ]);
